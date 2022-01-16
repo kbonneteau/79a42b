@@ -97,6 +97,25 @@ const sendMessage = (data, body) => {
   });
 };
 
+export const updateReadMessages = (body) => async (dispatch) => {
+  try {
+    await axios.put("/api/messages", body);
+
+    const { data } = await axios.get("/api/conversations");
+    // Sort the messages in each conversation before setting state.
+    data.forEach((conversation) =>
+      conversation.messages.sort(
+        (a, b) => new Date(a.createdAt) - new Date(b.createdAt)
+      )
+    );
+    dispatch(gotConversations(data));
+
+    
+  } catch (error) {
+    console.log(error);
+  }
+}
+
 // message format to send: {recipientId, text, conversationId}
 // conversationId will be set to null if its a brand new conversation
 export const postMessage = (body) => async (dispatch) => {
