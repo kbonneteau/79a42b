@@ -41,9 +41,11 @@ io.on("connection", (socket) => {
   });
 
   socket.on("new-message", (data) => {
+    const { message, sender, recipientId } = data;
     socket.broadcast.emit("new-message", {
-      message: data.message,
-      sender: data.sender,
+      message,
+      sender,
+      recipientId
     });
   });
 

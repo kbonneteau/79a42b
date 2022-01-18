@@ -5,6 +5,7 @@ import {
   removeOfflineUser,
   addOnlineUser,
 } from "./store/conversations";
+import { updateReadMessages } from "./store/utils/thunkCreators";
 
 const socket = io(window.location.origin);
 
@@ -18,8 +19,25 @@ socket.on("connect", () => {
   socket.on("remove-offline-user", (id) => {
     store.dispatch(removeOfflineUser(id));
   });
-  socket.on("new-message", (data) => {
-    store.dispatch(setNewMessage(data.message, data.sender));
+  socket.on("new-message", async (data) => {
+    // store.dispatch(setNewMessage(data.message, data.sender));
+
+    const state = store.getState();
+    await store.dispatch(
+      setNewMessage(data.message, data.sender, data.recipientId)
+    );
+
+    // If the new message is part of the user's active conversation, mark as read.
+    if (
+      state.activeConversation === data.message.conversationId &&
+      state.user.id === data.recipientId
+    ) {
+      // This code isn't executing...
+      await updateReadMessages({
+        conversationId: state.activeConversation,
+        userId: state.user.id,
+      });
+    }
   });
 });
 

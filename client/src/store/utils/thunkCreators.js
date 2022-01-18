@@ -5,6 +5,7 @@ import {
   addConversation,
   setNewMessage,
   setSearchedUsers,
+  updateMessages
 } from "../conversations";
 import { gotUser, setFetchingStatus } from "../user";
 
@@ -108,7 +109,7 @@ export const updateReadMessages = (body) => async (dispatch) => {
         (a, b) => new Date(a.createdAt) - new Date(b.createdAt)
       )
     );
-    dispatch(gotConversations(data));
+    dispatch(updateMessages(body.conversationId, body.userId));
 
     
   } catch (error) {
