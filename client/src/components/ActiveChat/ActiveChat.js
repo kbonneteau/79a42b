@@ -9,7 +9,7 @@ const useStyles = makeStyles(() => ({
   root: {
     display: "flex",
     flexGrow: 8,
-    flexDirection: "column"
+    flexDirection: "column",
   },
   chatContainer: {
     marginLeft: 41,
@@ -17,8 +17,8 @@ const useStyles = makeStyles(() => ({
     display: "flex",
     flexDirection: "column",
     flexGrow: 1,
-    justifyContent: "space-between"
-  }
+    justifyContent: "space-between",
+  },
 }));
 
 const ActiveChat = (props) => {
@@ -26,14 +26,14 @@ const ActiveChat = (props) => {
   const { user, updateReadMessages } = props;
   const conversation = props.conversation || {};
 
-  useEffect(async () => {
-    conversation.id && await updateReadMessages(
-      { 
-        conversationId: conversation.id,
-        userId: user.id
-      }
-      );
-  }, [updateReadMessages, conversation.id, user.id])
+  useEffect(() => {
+    const updateMessages = async (conversationId, userId) => {
+      const response = await updateReadMessages({ conversationId, userId });
+      return response;
+    };
+    // If there's a conversation ID active, update the messages in chat to read.
+    conversation.id && updateMessages(conversation.id, user.id);
+  }, [updateReadMessages, conversation.id, user.id]);
 
   return (
     <Box className={classes.root}>
@@ -67,8 +67,9 @@ const mapStateToProps = (state) => {
     conversation:
       state.conversations &&
       state.conversations.find(
-        (conversation) => conversation.otherUser.username === state.activeConversation
-      )
+        (conversation) =>
+          conversation.otherUser.username === state.activeConversation
+      ),
   };
 };
 

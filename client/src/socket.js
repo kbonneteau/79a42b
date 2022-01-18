@@ -20,8 +20,6 @@ socket.on("connect", () => {
     store.dispatch(removeOfflineUser(id));
   });
   socket.on("new-message", async (data) => {
-    // store.dispatch(setNewMessage(data.message, data.sender));
-
     const state = store.getState();
     await store.dispatch(
       setNewMessage(data.message, data.sender, data.recipientId)
@@ -32,7 +30,8 @@ socket.on("connect", () => {
       state.activeConversation === data.message.conversationId &&
       state.user.id === data.recipientId
     ) {
-      // This code isn't executing...
+      // This code isn't executing... however dispatching a state update will not update the server-side data
+      // And reducers shouldn't have any side-effects like async API calls.
       await updateReadMessages({
         conversationId: state.activeConversation,
         userId: state.user.id,

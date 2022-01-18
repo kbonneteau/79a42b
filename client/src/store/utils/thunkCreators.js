@@ -98,22 +98,13 @@ const sendMessage = (data, body) => {
   });
 };
 
+// format of body: {conversationId, userId}
 export const updateReadMessages = (body) => async (dispatch) => {
   try {
     await axios.put("/api/messages", body);
-
-    const { data } = await axios.get("/api/conversations");
-    // Sort the messages in each conversation before setting state.
-    data.forEach((conversation) =>
-      conversation.messages.sort(
-        (a, b) => new Date(a.createdAt) - new Date(b.createdAt)
-      )
-    );
-    dispatch(updateMessages(body.conversationId, body.userId));
-
-    
+    dispatch(updateMessages(body.conversationId, body.userId));   
   } catch (error) {
-    console.log(error);
+    console.error(error);
   }
 }
 
