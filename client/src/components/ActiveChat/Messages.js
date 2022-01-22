@@ -2,6 +2,7 @@ import React from "react";
 import { Box, Avatar } from "@material-ui/core";
 import { SenderBubble, OtherUserBubble } from "../ActiveChat";
 import moment from "moment";
+import { connect } from "react-redux";
 
 import { makeStyles } from "@material-ui/core/styles";
 
@@ -17,10 +18,11 @@ const Messages = (props) => {
   const classes = useStyles();
   const { messages, otherUser, userId } = props;
 
-  const readMessages = messages.filter((message) => {
-    if (message.senderId === userId && message.read) return message;
-    if (message.senderId === otherUser.id) return message;
-  });
+  const readMessages = messages.filter(
+    (message) =>
+      (message.senderId === userId && message.read) ||
+      message.senderId === otherUser.id
+  );
   const lastReadMessage = readMessages[readMessages.length - 1];
 
   return (
@@ -61,4 +63,10 @@ const Messages = (props) => {
   );
 };
 
-export default Messages;
+const mapStateToProps = (state) => {
+  return {
+    conversations: state.conversations
+  };
+};
+
+export default connect(mapStateToProps)(Messages);

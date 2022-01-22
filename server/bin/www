@@ -41,11 +41,12 @@ io.on("connection", (socket) => {
   });
 
   socket.on("new-message", (data) => {
-    const { message, sender, recipientId } = data;
+    const { message, sender, recipientId, senderName } = data;
     socket.broadcast.emit("new-message", {
       message,
       sender,
-      recipientId
+      recipientId,
+      senderName
     });
   });
 
