@@ -76,7 +76,6 @@ const mapStateToProps = (state) => {
 const mapDispatchToProps = (dispatch) => {
   return {
     updateReadMessages: (body) => {
-      // dispatch(logout(id));
       dispatch(updateReadMessages(body));
     },
   };

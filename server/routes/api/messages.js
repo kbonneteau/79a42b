@@ -46,9 +46,11 @@ router.post("/", async (req, res, next) => {
 
 router.put("/", async (req, res, next) => {
   try {
+    if (!req.user) {
+      return res.sendStatus(401);
+    }
     const { conversationId, userId } = req.body
 
-    // const messages = await Message.findMessagesByConversation(conversationId)
     const result = await Message.update({ read: true }, {
       where: {
         conversationId: conversationId,
