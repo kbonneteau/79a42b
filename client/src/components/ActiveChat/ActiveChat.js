@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useMemo, useRef } from "react";
 import { makeStyles } from "@material-ui/core/styles";
 import { Box } from "@material-ui/core";
 import { Input, Header, Messages } from "./index";
@@ -25,6 +25,11 @@ const ActiveChat = (props) => {
   const classes = useStyles();
   const { user, updateReadMessages } = props;
   const conversation = props.conversation || {};
+  const conversationRef = useRef(null);
+  const messages = useMemo(() => {
+    return conversation.messages;
+  }, [conversation.messages]);
+  console.log("ACTIVE CHAT CONVO ::", conversation);
 
   useEffect(() => {
     const updateMessages = async (conversationId, userId) => {
@@ -32,8 +37,19 @@ const ActiveChat = (props) => {
       return response;
     };
     // If there's a conversation ID active, update the messages in chat to read.
-    conversation.id && updateMessages(conversation.id, user.id);
+    if (conversation.id) {
+      updateMessages(conversation.id, user.id);
+      conversationRef.current = conversation.id;
+    }
   }, [updateReadMessages, conversation.id, user.id]);
+
+  useEffect(() => {
+    // conversationRef.current &&
+    //   updateReadMessages({
+    //     conversationId: conversationRef.current,
+    //     userId: user.id,
+    //   });
+  }, [messages]);
 
   return (
     <Box className={classes.root}>
@@ -45,9 +61,10 @@ const ActiveChat = (props) => {
           />
           <Box className={classes.chatContainer}>
             <Messages
-              messages={conversation.messages}
+              messages={messages}
               otherUser={conversation.otherUser}
               userId={user.id}
+              unreadCount={conversation.unreadCount}
             />
             <Input
               otherUser={conversation.otherUser}

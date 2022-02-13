@@ -49,20 +49,23 @@ router.put("/", async (req, res, next) => {
     if (!req.user) {
       return res.sendStatus(401);
     }
-    const { conversationId, userId } = req.body
+    const { conversationId, userId } = req.body;
 
-    const result = await Message.update({ read: true }, {
-      where: {
-        conversationId: conversationId,
-        [Op.not]: [
-          { senderId: userId },
-        ]
+    const result = await Message.update(
+      { read: true },
+      {
+        where: {
+          conversationId: conversationId,
+          [Op.not]: [{ senderId: userId }],
+        },
       }
-    })
-    res.send("success")
+    );
+    console.log("RESULTS OF MESSAGE UPDATE");
+    // Update the res.send
+    res.send("success");
   } catch (error) {
     next(error);
   }
-})
+});
 
 module.exports = router;

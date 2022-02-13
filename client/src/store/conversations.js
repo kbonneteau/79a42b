@@ -4,7 +4,7 @@ import {
   addSearchedUsersToStore,
   removeOfflineUserFromStore,
   addMessageToStore,
-  updateReadStatus
+  updateReadStatus,
 } from "./utils/reducerFunctions";
 
 // ACTIONS
@@ -69,12 +69,17 @@ export const addConversation = (recipientId, newMessage) => {
   };
 };
 
-export const updateMessages = (conversationId, currentUserId) => {
+export const updateMessages = (
+  conversationId,
+  currentUserId,
+  recipientNotification = false
+) => {
+  console.log("recipient notification status", recipientNotification);
   return {
     type: UPDATE_UNREAD_MESSAGES,
-    payload: { conversationId, currentUserId },
-  }
-}
+    payload: { conversationId, currentUserId, recipientNotification },
+  };
+};
 
 // REDUCER
 
@@ -104,8 +109,9 @@ const reducer = (state = [], action) => {
       return updateReadStatus(
         state,
         action.payload.conversationId,
-        action.payload.currentUserId
-      )
+        action.payload.currentUserId,
+        action.payload.recipientNotification
+      );
     default:
       return state;
   }

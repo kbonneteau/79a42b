@@ -46,7 +46,7 @@ io.on("connection", (socket) => {
       message,
       sender,
       recipientId,
-      senderName
+      senderName,
     });
   });
 
@@ -56,6 +56,16 @@ io.on("connection", (socket) => {
       onlineUsers.splice(userIndex, 1);
       socket.broadcast.emit("remove-offline-user", id);
     }
+  });
+
+  socket.on("messages-read", (data) => {
+    console.log("HELLO MESSAGES READ SOCKET. BROADCASTING...");
+    console.log(data);
+    const { conversationId, userId } = data;
+    socket.broadcast.emit("messages-read", {
+      conversationId,
+      userId,
+    });
   });
 });
 

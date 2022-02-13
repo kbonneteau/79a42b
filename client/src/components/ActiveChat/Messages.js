@@ -1,8 +1,8 @@
-import React from "react";
+import React, { useEffect, useRef } from "react";
 import { Box, Avatar } from "@material-ui/core";
 import { SenderBubble, OtherUserBubble } from "../ActiveChat";
 import moment from "moment";
-import { connect } from "react-redux";
+// import { connect } from "react-redux";
 
 import { makeStyles } from "@material-ui/core/styles";
 
@@ -16,14 +16,19 @@ const useStyles = makeStyles(() => ({
 
 const Messages = (props) => {
   const classes = useStyles();
-  const { messages, otherUser, userId } = props;
+  const { messages, otherUser, userId, unreadCount } = props;
+  console.log("messages props",props)
 
-  const readMessages = messages.filter(
-    (message) =>
-      (message.senderId === userId && message.read) ||
-      message.senderId === otherUser.id
-  );
-  const lastReadMessage = readMessages[readMessages.length - 1];
+  const lastReadMessageRef = useRef(null);
+
+  useEffect(() => {
+    const readMessages = messages.filter(
+      (message) =>
+        (message.senderId === userId && message.read) ||
+        message.senderId === otherUser.id
+    );
+    lastReadMessageRef.current = readMessages[readMessages.length - 1];
+  }, [unreadCount, messages, otherUser.id, userId])
 
   return (
     <Box>
@@ -33,7 +38,7 @@ const Messages = (props) => {
         return message.senderId === userId ? (
           <React.Fragment key={message.id}>
             <SenderBubble text={message.text} time={time} />
-            {lastReadMessage && message.id === lastReadMessage.id && (
+            {lastReadMessageRef.current && message.id === lastReadMessageRef.current.id && (
               <Avatar
                 alt={otherUser.username}
                 src={otherUser.photoUrl}
@@ -49,7 +54,7 @@ const Messages = (props) => {
               time={time}
               otherUser={otherUser}
             />
-            {lastReadMessage && message.id === lastReadMessage.id && (
+            {lastReadMessageRef.current && message.id === lastReadMessageRef.current.id && (
               <Avatar
                 alt={otherUser.username}
                 src={otherUser.photoUrl}
@@ -63,10 +68,11 @@ const Messages = (props) => {
   );
 };
 
-const mapStateToProps = (state) => {
-  return {
-    conversations: state.conversations
-  };
-};
+// const mapStateToProps = (state) => {
+//   return {
+//     conversations: state.conversations
+//   };
+// };
 
-export default connect(mapStateToProps)(Messages);
+// export default connect(mapStateToProps)(Messages);
+export default Messages;
