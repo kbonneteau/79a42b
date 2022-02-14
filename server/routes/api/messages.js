@@ -60,9 +60,19 @@ router.put("/", async (req, res, next) => {
         },
       }
     );
-    console.log("RESULTS OF MESSAGE UPDATE");
+
+    const readMessages = await Message.findAll({
+      where: {
+        conversationId: conversationId,
+        [Op.not]: [{ senderId: userId }],
+      },
+    });
+
+    const lastReadMessage = readMessages[readMessages.length - 1].dataValues;
+    console.log(lastReadMessage);
+    // console.log("RESULTS OF MESSAGE UPDATE", result);
     // Update the res.send
-    res.send("success");
+    res.json({ lastReadMessage });
   } catch (error) {
     next(error);
   }

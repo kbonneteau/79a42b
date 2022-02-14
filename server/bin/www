@@ -61,10 +61,11 @@ io.on("connection", (socket) => {
   socket.on("messages-read", (data) => {
     console.log("HELLO MESSAGES READ SOCKET. BROADCASTING...");
     console.log(data);
-    const { conversationId, userId } = data;
+    const { conversationId, userId, lastReadMessage } = data;
     socket.broadcast.emit("messages-read", {
       conversationId,
       userId,
+      lastReadMessage,
     });
   });
 });
