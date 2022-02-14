@@ -51,26 +51,6 @@ router.get("/", async (req, res, next) => {
       const convo = conversations[i];
       const convoJSON = convo.toJSON();
 
-      // // console.log("SINGLE CONVERSATION", conversations[i].messages)
-
-      // const unreadMessages = conversations[i].messages.filter(
-      //   (message) => {
-      //     const { read, senderId } = message.dataValues
-      //     // console.log("MESSAGE", message.dataValues)
-      //     // console.log("USER ID", userId)
-      //     // return message
-      //     return !read && senderId !== userId
-      //   }
-      // );
-
-      // console.log("UNREAD MESSAGES", unreadMessages)
-
-      // // const lastUnreadMessage;
-
-      // const countOfUnreadMessages = unreadMessages.length
-
-      // console.log("unread message count", countOfUnreadMessages);
-
       // set a property "otherUser" so that frontend will have easier access
       if (convoJSON.user1) {
         convoJSON.otherUser = convoJSON.user1;

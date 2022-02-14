@@ -61,6 +61,7 @@ router.put("/", async (req, res, next) => {
       }
     );
 
+    // Get a list of read messages we can use in the response to client
     const readMessages = await Message.findAll({
       where: {
         conversationId: conversationId,
@@ -68,11 +69,13 @@ router.put("/", async (req, res, next) => {
       },
     });
 
-    const lastReadMessage = readMessages[readMessages.length - 1].dataValues;
-    console.log(lastReadMessage);
-    // console.log("RESULTS OF MESSAGE UPDATE", result);
-    // Update the res.send
-    res.json({ lastReadMessage });
+    // If this is a fresh conversation, handle if the messages haven't been read yet
+    if (readMessages > 0) {
+      const lastReadMessage = readMessages[readMessages.length - 1].dataValues;
+      res.status(200).json({ lastReadMessage });
+    } else {
+      res.status(204).json({ message: "success" });
+    }
   } catch (error) {
     next(error);
   }
