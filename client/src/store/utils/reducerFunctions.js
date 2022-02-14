@@ -85,13 +85,14 @@ export const addNewConvoToStore = (state, recipientId, message) => {
   });
 };
 
-export const updateReadStatus = (
-  state,
-  conversationId,
-  activeUserId,
-  recipientNotification
-) => {
+export const updateReadStatus = (state, payload) => {
   return state.map((conversation) => {
+    const {
+      conversationId,
+      currentUserId,
+      recipientNotification,
+      lastReadMessage,
+    } = payload;
     // For the currently active conversation
     if (conversation.id === conversationId) {
       return {
@@ -99,14 +100,14 @@ export const updateReadStatus = (
         unreadCount: 0,
         messages: conversation.messages.map((message) => {
           // If the sender of the message isn't the current user, mark the messages as read in state
-          if (message.senderId !== activeUserId) {
+          if (message.senderId !== currentUserId) {
             return {
               ...message,
               read: true,
             };
           }
-          // If the recipient notified their conversation is active, mark as read
-          if (recipientNotification) {
+          // If the recipient provided a read receipt, mark as read
+          if (recipientNotification && message.senderId !== currentUserId) {
             return {
               ...message,
               read: true,

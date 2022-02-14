@@ -72,12 +72,20 @@ export const addConversation = (recipientId, newMessage) => {
 export const updateMessages = (
   conversationId,
   currentUserId,
-  recipientNotification = false
+  recipientNotification = false,
+  lastReadMessage = {}
 ) => {
   console.log("recipient notification status", recipientNotification);
+  console.log("Last read message", lastReadMessage);
+
   return {
     type: UPDATE_UNREAD_MESSAGES,
-    payload: { conversationId, currentUserId, recipientNotification },
+    payload: {
+      conversationId,
+      currentUserId,
+      recipientNotification,
+      lastReadMessage,
+    },
   };
 };
 
@@ -106,12 +114,7 @@ const reducer = (state = [], action) => {
         action.payload.newMessage
       );
     case UPDATE_UNREAD_MESSAGES:
-      return updateReadStatus(
-        state,
-        action.payload.conversationId,
-        action.payload.currentUserId,
-        action.payload.recipientNotification
-      );
+      return updateReadStatus(state, action.payload);
     default:
       return state;
   }

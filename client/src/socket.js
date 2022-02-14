@@ -50,10 +50,16 @@ socket.on("connect", () => {
   socket.on("messages-read", (data) => {
     console.log("hello from socket :: messages read");
     console.log(data);
-    const { conversationId, userId } = data;
+    const { conversationId, userId, lastReadMessage } = data;
     const recipientNotification = true;
+    console.log(userId);
     store.dispatch(
-      updateMessages(conversationId, userId, recipientNotification)
+      updateMessages(
+        conversationId,
+        userId,
+        recipientNotification,
+        lastReadMessage
+      )
     );
     // break
   });

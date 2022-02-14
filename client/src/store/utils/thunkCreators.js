@@ -114,10 +114,11 @@ const sendMessage = (data, body) => {
 };
 
 export const notifyMessagesRead = (body) => {
-  const { conversationId, userId } = body;
+  const { conversationId, userId, lastReadMessage } = body;
   socket.emit("messages-read", {
     conversationId,
     userId,
+    lastReadMessage,
   });
 };
 
@@ -125,12 +126,14 @@ export const notifyMessagesRead = (body) => {
 export const updateReadMessages = (body) => async (dispatch) => {
   console.log("=== thunk read:", body);
   try {
-    await axios.put("/api/messages", body);
+    const { data } = await axios.put("/api/messages", body);
+    console.log("=== data", data);
     dispatch(updateMessages(body.conversationId, body.userId));
 
     notifyMessagesRead({
       conversationId: body.conversationId,
       userId: body.userId,
+      lastReadMessage: data.lastReadMessage,
     });
   } catch (error) {
     console.error(error);
