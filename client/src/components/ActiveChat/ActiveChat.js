@@ -29,7 +29,6 @@ const ActiveChat = (props) => {
   const messages = useMemo(() => {
     return conversation.messages;
   }, [conversation.messages]);
-  console.log("ACTIVE CHAT CONVO ::", conversation);
 
   useEffect(() => {
     const updateMessages = async (conversationId, userId) => {
@@ -42,14 +41,6 @@ const ActiveChat = (props) => {
       conversationRef.current = conversation.id;
     }
   }, [updateReadMessages, conversation.id, user.id]);
-
-  useEffect(() => {
-    // conversationRef.current &&
-    //   updateReadMessages({
-    //     conversationId: conversationRef.current,
-    //     userId: user.id,
-    //   });
-  }, [messages]);
 
   return (
     <Box className={classes.root}>

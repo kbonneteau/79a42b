@@ -22,9 +22,10 @@ const useStyles = makeStyles((theme) => ({
 
 const Chat = (props) => {
   const classes = useStyles();
+
   const { conversation } = props;
   const { otherUser } = conversation;
-  // This is done on every render.  Can I do this elsewhere?
+
   const unreadMessages = conversation.messages.filter(
     (message) => !message.read && message.senderId === otherUser.id
   );

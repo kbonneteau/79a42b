@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect } from "react";
 import { Box, Avatar } from "@material-ui/core";
 import { SenderBubble, OtherUserBubble } from "../ActiveChat";
 import moment from "moment";
@@ -15,20 +15,22 @@ const useStyles = makeStyles(() => ({
 
 const Messages = (props) => {
   const classes = useStyles();
+
   const { messages, otherUser, userId, unreadCount } = props;
   const [lastReadMessage, setLastReadMessage] = useState(null);
-  const lastReadMessageRef = useRef(null);
 
   useEffect(() => {
+    // Check if the message has been read, and set a retain a reference
+    let latestMessage = {};
     messages.forEach((message) => {
       if (
         (message.senderId === userId && message.read) ||
         message.senderId === otherUser.id
       ) {
-        lastReadMessageRef.current = message;
+        latestMessage = message;
       }
     });
-    setLastReadMessage(lastReadMessageRef.current);
+    setLastReadMessage(latestMessage);
   }, [unreadCount, messages, otherUser.id, userId]);
 
   return (
