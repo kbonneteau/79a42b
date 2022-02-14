@@ -36,32 +36,16 @@ socket.on("connect", () => {
           userId: user.id,
         })
       );
-
-      // await axios.put("/api/messages", {
-      //   conversationId: message.conversationId,
-      //   userId: user.id,
-      //   activeConversation: true,
-      // });
-      // await store.dispatch(updateMessages(message.conversationId, user.id));
-      // notifyMessagesRead();
     }
   });
 
   socket.on("messages-read", (data) => {
-    console.log("hello from socket :: messages read");
-    console.log(data);
-    const { conversationId, userId, lastReadMessage } = data;
+    const { conversationId, userId } = data;
+    // If this socket is received, the recipient sent a read receipt
     const recipientNotification = true;
-    console.log(userId);
     store.dispatch(
-      updateMessages(
-        conversationId,
-        userId,
-        recipientNotification,
-        lastReadMessage
-      )
+      updateMessages(conversationId, userId, recipientNotification)
     );
-    // break
   });
 });
 

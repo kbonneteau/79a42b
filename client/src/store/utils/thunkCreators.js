@@ -73,10 +73,7 @@ export const logout = (id) => async (dispatch) => {
 export const fetchConversations = () => async (dispatch, getState) => {
   try {
     const { user } = getState();
-    console.log("state", user);
     const { data } = await axios.get("/api/conversations");
-    // Sort the messages in each conversation before setting state.
-    console.log("fetchConversations data", data);
 
     data.forEach((conversation) => {
       conversation.messages.sort(
@@ -84,15 +81,11 @@ export const fetchConversations = () => async (dispatch, getState) => {
       );
       const unreadMessages = conversation.messages.filter((message) => {
         const { read, senderId } = message;
-        // console.log("message", message)
         return !read && senderId !== user.id;
       });
       conversation.lastReadMessage = unreadMessages;
       conversation.unreadCount = unreadMessages.length;
-      // console.log("unread messages", unreadMessages)
-      // console.log("conversation", conversation)
     });
-    console.log("data", data);
     dispatch(gotConversations(data));
   } catch (error) {
     console.error(error);
@@ -114,26 +107,23 @@ const sendMessage = (data, body) => {
 };
 
 export const notifyMessagesRead = (body) => {
-  const { conversationId, userId, lastReadMessage } = body;
+  const { conversationId, userId } = body;
+  // Send a read receipt to server socket
   socket.emit("messages-read", {
     conversationId,
     userId,
-    lastReadMessage,
   });
 };
 
 // format of body: {conversationId, userId}
 export const updateReadMessages = (body) => async (dispatch) => {
-  console.log("=== thunk read:", body);
   try {
-    const { data } = await axios.put("/api/messages", body);
-    console.log("=== data", data);
+    await axios.put("/api/messages", body);
     dispatch(updateMessages(body.conversationId, body.userId));
 
     notifyMessagesRead({
       conversationId: body.conversationId,
       userId: body.userId,
-      lastReadMessage: data.lastReadMessage,
     });
   } catch (error) {
     console.error(error);

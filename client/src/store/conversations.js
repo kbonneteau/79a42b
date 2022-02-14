@@ -72,19 +72,14 @@ export const addConversation = (recipientId, newMessage) => {
 export const updateMessages = (
   conversationId,
   currentUserId,
-  recipientNotification = false,
-  lastReadMessage = {}
+  recipientNotification = false
 ) => {
-  console.log("recipient notification status", recipientNotification);
-  console.log("Last read message", lastReadMessage);
-
   return {
     type: UPDATE_UNREAD_MESSAGES,
     payload: {
       conversationId,
       currentUserId,
       recipientNotification,
-      lastReadMessage,
     },
   };
 };

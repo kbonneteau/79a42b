@@ -87,12 +87,7 @@ export const addNewConvoToStore = (state, recipientId, message) => {
 
 export const updateReadStatus = (state, payload) => {
   return state.map((conversation) => {
-    const {
-      conversationId,
-      currentUserId,
-      recipientNotification,
-      lastReadMessage,
-    } = payload;
+    const { conversationId, currentUserId, recipientNotification } = payload;
     // For the currently active conversation
     if (conversation.id === conversationId) {
       return {
