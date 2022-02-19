@@ -21,4 +21,16 @@ Conversation.findConversation = async function (user1Id, user2Id) {
   return conversation;
 };
 
+Conversation.findConversationById = async function (conversationId, userId) {
+  const conversation = await Conversation.findOne({
+    where: {
+      id: conversationId,
+      [Op.or]: [{ user1Id: userId }, { user2Id: userId }],
+    },
+  });
+
+  // return conversation or null if it doesn't exist
+  return conversation;
+};
+
 module.exports = Conversation;

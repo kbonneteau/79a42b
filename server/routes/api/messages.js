@@ -51,6 +51,17 @@ router.put("/", async (req, res, next) => {
     }
     const { conversationId, userId } = req.body;
 
+    // Check if the user belongs to the conversation they're attempting to update
+    const conversation = await Conversation.findConversationById(
+      conversationId,
+      req.user.id
+    );
+    if (!conversation) {
+      return res
+        .status(403)
+        .json({ message: "Unauthorized to access conversation" });
+    }
+
     const result = await Message.update(
       { read: true },
       {
@@ -61,7 +72,7 @@ router.put("/", async (req, res, next) => {
       }
     );
 
-    res.status(204).json({ message: "success" });
+    res.status(200).json({ message: "success" });
   } catch (error) {
     next(error);
   }

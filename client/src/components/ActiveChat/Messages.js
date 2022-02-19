@@ -45,7 +45,7 @@ const Messages = (props) => {
                 alt={otherUser.username}
                 src={otherUser.photoUrl}
                 className={classes.profilePic}
-              ></Avatar>
+              />
             )}
           </React.Fragment>
         ) : (
@@ -61,7 +61,7 @@ const Messages = (props) => {
                 alt={otherUser.username}
                 src={otherUser.photoUrl}
                 className={classes.profilePic}
-              ></Avatar>
+              />
             )}
           </React.Fragment>
         );
