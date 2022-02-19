@@ -5,6 +5,7 @@ import {
   addConversation,
   setNewMessage,
   setSearchedUsers,
+  updateMessages,
 } from "../conversations";
 import { gotUser, setFetchingStatus } from "../user";
 
@@ -69,15 +70,22 @@ export const logout = (id) => async (dispatch) => {
 
 // CONVERSATIONS THUNK CREATORS
 
-export const fetchConversations = () => async (dispatch) => {
+export const fetchConversations = () => async (dispatch, getState) => {
   try {
+    const { user } = getState();
     const { data } = await axios.get("/api/conversations");
-    // Sort the messages in each conversation before setting state.
-    data.forEach((conversation) =>
+
+    data.forEach((conversation) => {
       conversation.messages.sort(
         (a, b) => new Date(a.createdAt) - new Date(b.createdAt)
-      )
-    );
+      );
+      const unreadMessages = conversation.messages.filter((message) => {
+        const { read, senderId } = message;
+        return !read && senderId !== user.id;
+      });
+      conversation.lastReadMessage = unreadMessages;
+      conversation.unreadCount = unreadMessages.length;
+    });
     dispatch(gotConversations(data));
   } catch (error) {
     console.error(error);
@@ -94,7 +102,32 @@ const sendMessage = (data, body) => {
     message: data.message,
     recipientId: body.recipientId,
     sender: data.sender,
+    senderName: body.senderName,
   });
+};
+
+export const notifyMessagesRead = (body) => {
+  const { conversationId, userId } = body;
+  // Send a read receipt to server socket
+  socket.emit("messages-read", {
+    conversationId,
+    userId,
+  });
+};
+
+// format of body: {conversationId, userId}
+export const updateReadMessages = (body) => async (dispatch) => {
+  try {
+    await axios.put("/api/messages", body);
+    dispatch(updateMessages(body.conversationId, body.userId));
+
+    notifyMessagesRead({
+      conversationId: body.conversationId,
+      userId: body.userId,
+    });
+  } catch (error) {
+    console.error(error);
+  }
 };
 
 // message format to send: {recipientId, text, conversationId}

@@ -76,10 +76,43 @@ export const addNewConvoToStore = (state, recipientId, message) => {
         ...convo,
         id: message.conversationId,
         messages: [...convo.messages, message],
-        latestMessageText: message.text
+        latestMessageText: message.text,
+        lastUnreadMessage: message.text,
       };
     } else {
       return convo;
     }
+  });
+};
+
+export const updateReadStatus = (state, payload) => {
+  return state.map((conversation) => {
+    const { conversationId, currentUserId, recipientNotification } = payload;
+    // For the currently active conversation
+    if (conversation.id === conversationId) {
+      return {
+        ...conversation,
+        unreadCount: 0,
+        messages: conversation.messages.map((message) => {
+          // If the sender of the message isn't the current user, mark the messages as read in state
+          if (message.senderId !== currentUserId) {
+            return {
+              ...message,
+              read: true,
+            };
+          }
+          // If the recipient provided a read receipt, mark as read
+          if (recipientNotification && message.senderId !== currentUserId) {
+            return {
+              ...message,
+              read: true,
+            };
+          }
+
+          return message;
+        }),
+      };
+    }
+    return conversation;
   });
 };

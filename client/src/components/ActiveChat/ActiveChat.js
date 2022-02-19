@@ -1,14 +1,15 @@
-import React from "react";
+import React, { useEffect, useMemo, useRef } from "react";
 import { makeStyles } from "@material-ui/core/styles";
 import { Box } from "@material-ui/core";
 import { Input, Header, Messages } from "./index";
 import { connect } from "react-redux";
+import { updateReadMessages } from "../../store/utils/thunkCreators";
 
 const useStyles = makeStyles(() => ({
   root: {
     display: "flex",
     flexGrow: 8,
-    flexDirection: "column"
+    flexDirection: "column",
   },
   chatContainer: {
     marginLeft: 41,
@@ -16,14 +17,30 @@ const useStyles = makeStyles(() => ({
     display: "flex",
     flexDirection: "column",
     flexGrow: 1,
-    justifyContent: "space-between"
-  }
+    justifyContent: "space-between",
+  },
 }));
 
 const ActiveChat = (props) => {
   const classes = useStyles();
-  const { user } = props;
+  const { user, updateReadMessages } = props;
   const conversation = props.conversation || {};
+  const conversationRef = useRef(null);
+  const messages = useMemo(() => {
+    return conversation.messages;
+  }, [conversation.messages]);
+
+  useEffect(() => {
+    const updateMessages = async (conversationId, userId) => {
+      const response = await updateReadMessages({ conversationId, userId });
+      return response;
+    };
+    // If there's a conversation ID active, update the messages in chat to read.
+    if (conversation.id) {
+      updateMessages(conversation.id, user.id);
+      conversationRef.current = conversation.id;
+    }
+  }, [updateReadMessages, conversation.id, user.id]);
 
   return (
     <Box className={classes.root}>
@@ -35,9 +52,10 @@ const ActiveChat = (props) => {
           />
           <Box className={classes.chatContainer}>
             <Messages
-              messages={conversation.messages}
+              messages={messages}
               otherUser={conversation.otherUser}
               userId={user.id}
+              unreadCount={conversation.unreadCount}
             />
             <Input
               otherUser={conversation.otherUser}
@@ -57,9 +75,18 @@ const mapStateToProps = (state) => {
     conversation:
       state.conversations &&
       state.conversations.find(
-        (conversation) => conversation.otherUser.username === state.activeConversation
-      )
+        (conversation) =>
+          conversation.otherUser.username === state.activeConversation
+      ),
   };
 };
 
-export default connect(mapStateToProps, null)(ActiveChat);
+const mapDispatchToProps = (dispatch) => {
+  return {
+    updateReadMessages: (body) => {
+      dispatch(updateReadMessages(body));
+    },
+  };
+};
+
+export default connect(mapStateToProps, mapDispatchToProps)(ActiveChat);

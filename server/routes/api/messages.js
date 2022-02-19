@@ -1,6 +1,7 @@
 const router = require("express").Router();
 const { Conversation, Message } = require("../../db/models");
 const onlineUsers = require("../../onlineUsers");
+const { Op } = require("sequelize");
 
 // expects {recipientId, text, conversationId } in body (conversationId will be null if no conversation exists yet)
 router.post("/", async (req, res, next) => {
@@ -38,6 +39,40 @@ router.post("/", async (req, res, next) => {
       conversationId: conversation.id,
     });
     res.json({ message, sender });
+  } catch (error) {
+    next(error);
+  }
+});
+
+router.put("/", async (req, res, next) => {
+  try {
+    if (!req.user) {
+      return res.sendStatus(401);
+    }
+    const { conversationId, userId } = req.body;
+
+    // Check if the user belongs to the conversation they're attempting to update
+    const conversation = await Conversation.findConversationById(
+      conversationId,
+      req.user.id
+    );
+    if (!conversation) {
+      return res
+        .status(403)
+        .json({ message: "Unauthorized to access conversation" });
+    }
+
+    const result = await Message.update(
+      { read: true },
+      {
+        where: {
+          conversationId: conversationId,
+          [Op.not]: [{ senderId: userId }],
+        },
+      }
+    );
+
+    res.status(200).json({ message: "success" });
   } catch (error) {
     next(error);
   }
