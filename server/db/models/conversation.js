@@ -1,7 +1,12 @@
-const { Op } = require("sequelize");
+const { Op, STRING } = require("sequelize");
 const db = require("../db");
 
-const Conversation = db.define("conversation", {});
+const Conversation = db.define("conversation", {
+  name: {
+    type: STRING,
+    allowNull: true
+  }
+});
 
 // find conversation given two user Ids
 
